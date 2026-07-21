@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAppStore } from "@/lib/store";
+import { useRouter } from "next/navigation";
 import { HeartPulse, Key, User, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -10,6 +11,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const currentUser = useAppStore(state => state.currentUser);
   const login = useAppStore(state => state.login);
   const childrenDb = useAppStore(state => state.children);
+  const router = useRouter();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
@@ -26,19 +29,40 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     
     if (cleanId === "admin" && password === "password123") {
       login("admin");
+      setIsRedirecting(true);
       toast.success("Authenticated as Anganwadi Admin");
+      // Redirect to admin dashboard
+      setTimeout(() => router.push("/"), 100);
       return;
     }
 
     const child = childrenDb.find(c => c.id === cleanId);
     if (child && password === child.password) {
       login(child.id);
+      setIsRedirecting(true);
       toast.success(`Authenticated as Parent of ${child.name}`);
+      // Redirect to parent dashboard
+      setTimeout(() => router.push("/"), 100);
       return;
     }
 
     toast.error("Invalid User ID or Password.");
   };
+
+  // If redirecting, show loading state
+  if (isRedirecting) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <motion.div
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 0.6, repeat: Infinity }}
+          className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center text-white shadow-xl"
+        >
+          <HeartPulse size={32} />
+        </motion.div>
+      </div>
+    );
+  }
 
   if (!currentUser) {
     return (

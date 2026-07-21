@@ -137,7 +137,7 @@ export default function VoiceCopilot() {
     if (!matchedChild || !parsedData.weight_kg) return;
     
     const newWeight = parsedData.weight_kg;
-    const { risk, aiPrediction } = calculateNutritionalRisk(matchedChild.ageMonths, newWeight, matchedChild.gender);
+    const { risk } = calculateNutritionalRisk(matchedChild.ageMonths, newWeight, matchedChild.gender);
     
     // Demo 3mo velocity delta
     const velocity = parseFloat((newWeight - matchedChild.weightKg).toFixed(1));
@@ -146,7 +146,6 @@ export default function VoiceCopilot() {
       weightKg: newWeight,
       flags: parsedData.clinical_flags,
       risk,
-      aiPrediction,
       velocity3mo: velocity
     });
 

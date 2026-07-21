@@ -14,10 +14,29 @@ export default function ChildProfilePage() {
   const children = useAppStore(state => state.children);
   const currentUser = useAppStore(state => state.currentUser);
   const [child, setChild] = useState<any>(null);
+  const [isAuthorized, setIsAuthorized] = useState(true);
   
   useEffect(() => {
-    setChild(children.find(c => c.id === params.id));
-  }, [children, params.id]);
+    const foundChild = children.find(c => c.id === params.id);
+    setChild(foundChild);
+
+    // Access control: only admin can view all profiles, parents can only view their own child
+    if (currentUser && currentUser !== 'admin' && currentUser !== params.id) {
+      setIsAuthorized(false);
+      toast.error("You don't have permission to view this profile.");
+      setTimeout(() => router.push("/"), 1500);
+    }
+  }, [children, params.id, currentUser, router]);
+
+  if (!isAuthorized) {
+    return (
+      <div className="flex h-full items-center justify-center flex-col gap-4">
+        <h1 className="text-2xl font-bold text-red-600">Access Denied</h1>
+        <p className="text-slate-500">You don't have permission to view this profile.</p>
+        <button onClick={() => router.push("/")} className="px-6 py-2 bg-slate-900 text-white rounded-lg mt-4">Return to Dashboard</button>
+      </div>
+    );
+  }
 
   if (!child) {
     return (

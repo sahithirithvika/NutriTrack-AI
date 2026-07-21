@@ -2,14 +2,13 @@
 
 import { Search, Filter, ShieldAlert, AlertTriangle, ArrowRight, User } from "lucide-react";
 import { useAppStore } from "@/lib/store";
-import Link from "next/link";
 import { motion } from "framer-motion";
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function VillageRadar() {
   const children = useAppStore(state => state.children);
   const currentUser = useAppStore(state => state.currentUser);
+  const router = useRouter();
   
   const criticalCount = children.filter(c => c.risk === "critical").length;
   const warningCount = children.filter(c => c.risk === "warning").length;
@@ -74,11 +73,12 @@ export default function VillageRadar() {
               </div>
             </div>
 
-            <Link href={`/child/${child.id}`}>
-              <button className="w-full flex items-center justify-center gap-3 py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold shadow-lg shadow-indigo-600/30 transition-all text-lg group">
+              <button 
+                onClick={() => router.push(`/child/${child.id}`)}
+                className="w-full flex items-center justify-center gap-3 py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold shadow-lg shadow-indigo-600/30 transition-all text-lg group"
+              >
                 View Deep Clinical Profile <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </button>
-            </Link>
           </motion.div>
         </div>
       </div>
@@ -133,58 +133,58 @@ export default function VillageRadar() {
           const isWarning = child.risk === "warning";
           
           return (
-            <Link href={`/child/${child.id}`} key={child.id}>
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -5, scale: 1.02 }}
-                className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-[32px] p-8 border border-white/80 dark:border-slate-700/50 shadow-2xl shadow-slate-200/40 dark:shadow-none cursor-pointer group relative overflow-hidden h-full flex flex-col"
-              >
-                {/* Decorative background gradient */}
-                {isCritical && <div className="absolute top-0 right-0 w-48 h-48 bg-red-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>}
-                {isWarning && <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>}
-                {!isCritical && !isWarning && <div className="absolute top-0 right-0 w-48 h-48 bg-green-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>}
+            <motion.div
+              key={child.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              whileHover={{ y: -5, scale: 1.02 }}
+              onClick={() => router.push(`/child/${child.id}`)}
+              className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-[32px] p-8 border border-white/80 dark:border-slate-700/50 shadow-2xl shadow-slate-200/40 dark:shadow-none cursor-pointer group relative overflow-hidden h-full flex flex-col transition-all"
+            >
+              {/* Decorative background gradient */}
+              {isCritical && <div className="absolute top-0 right-0 w-48 h-48 bg-red-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>}
+              {isWarning && <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>}
+              {!isCritical && !isWarning && <div className="absolute top-0 right-0 w-48 h-48 bg-green-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>}
 
-                <div className="flex justify-between items-start mb-8 z-10">
-                  <div className="flex items-center gap-5">
-                    <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg ${
-                      isCritical ? "bg-red-500 shadow-red-500/30" : isWarning ? "bg-amber-500 shadow-amber-500/30" : "bg-green-500 shadow-green-500/30"
-                    }`}>
-                      {child.name.charAt(0)}
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-xl text-slate-900 dark:text-white">{child.name}</h3>
-                      <p className="text-sm text-slate-500 font-medium">{child.ageMonths}m • {child.gender}</p>
-                    </div>
+              <div className="flex justify-between items-start mb-8 z-10">
+                <div className="flex items-center gap-5">
+                  <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg ${
+                    isCritical ? "bg-red-500 shadow-red-500/30" : isWarning ? "bg-amber-500 shadow-amber-500/30" : "bg-green-500 shadow-green-500/30"
+                  }`}>
+                    {child.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-xl text-slate-900 dark:text-white">{child.name}</h3>
+                    <p className="text-sm text-slate-500 font-medium">{child.ageMonths}m • {child.gender}</p>
                   </div>
                 </div>
+              </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-8 z-10 flex-1">
-                  <div className="bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm p-4 rounded-[20px] flex flex-col justify-center border border-white/50">
-                    <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Weight</p>
-                    <p className="font-bold text-xl text-slate-900 dark:text-white">{child.weightKg} kg</p>
-                  </div>
-                  <div className="bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm p-4 rounded-[20px] flex flex-col justify-center border border-white/50">
-                    <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">3mo Velocity</p>
-                    <p className={`font-bold text-xl ${child.velocity3mo < 0 ? "text-red-500" : "text-green-500"}`}>
-                      {child.velocity3mo > 0 ? "+" : ""}{child.velocity3mo} kg
-                    </p>
-                  </div>
+              <div className="grid grid-cols-2 gap-4 mb-8 z-10 flex-1">
+                <div className="bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm p-4 rounded-[20px] flex flex-col justify-center border border-white/50">
+                  <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Weight</p>
+                  <p className="font-bold text-xl text-slate-900 dark:text-white">{child.weightKg} kg</p>
                 </div>
+                <div className="bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm p-4 rounded-[20px] flex flex-col justify-center border border-white/50">
+                  <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">3mo Velocity</p>
+                  <p className={`font-bold text-xl ${child.velocity3mo < 0 ? "text-red-500" : "text-green-500"}`}>
+                    {child.velocity3mo > 0 ? "+" : ""}{child.velocity3mo} kg
+                  </p>
+                </div>
+              </div>
 
-                <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800 z-10">
-                  <div className="flex items-center gap-2">
-                    {isCritical && <span className="bg-red-50 text-red-600 dark:bg-red-500/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-red-100 dark:border-red-500/20">Critical Risk</span>}
-                    {isWarning && <span className="bg-amber-50 text-amber-600 dark:bg-amber-500/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-amber-100 dark:border-amber-500/20">Warning</span>}
-                    {!isCritical && !isWarning && <span className="bg-green-50 text-green-600 dark:bg-green-500/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-green-100 dark:border-green-500/20">Healthy</span>}
-                  </div>
-                  <div className="flex items-center gap-2 text-blue-500 font-bold group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                    View Profile <ArrowRight size={18} />
-                  </div>
+              <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800 z-10">
+                <div className="flex items-center gap-2">
+                  {isCritical && <span className="bg-red-50 text-red-600 dark:bg-red-500/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-red-100 dark:border-red-500/20">Critical Risk</span>}
+                  {isWarning && <span className="bg-amber-50 text-amber-600 dark:bg-amber-500/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-amber-100 dark:border-amber-500/20">Warning</span>}
+                  {!isCritical && !isWarning && <span className="bg-green-50 text-green-600 dark:bg-green-500/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-green-100 dark:border-green-500/20">Healthy</span>}
                 </div>
-              </motion.div>
-            </Link>
+                <div className="flex items-center gap-2 text-blue-500 font-bold group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  View Profile <ArrowRight size={18} />
+                </div>
+              </div>
+            </motion.div>
           );
         })}
       </div>
