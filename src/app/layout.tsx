@@ -26,10 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${outfit.variable} antialiased`} suppressHydrationWarning>
-      <body className="text-slate-900 dark:text-slate-100 flex h-screen overflow-hidden relative bg-slate-50 dark:bg-slate-950">
-        {/* Global Glass Blur Wallpaper */}
-        <div className="fixed inset-0 -z-20 bg-[url('/bg-wallpaper.png')] bg-cover bg-center opacity-80 dark:opacity-40"></div>
-        <div className="fixed inset-0 -z-10 bg-white/40 dark:bg-slate-950/60 backdrop-blur-3xl"></div>
+      <body className="flex h-screen overflow-hidden mesh-bg" style={{ color: "var(--foreground)" }}>
         
         <Toaster richColors position="top-right" />
         <AuthGuard>

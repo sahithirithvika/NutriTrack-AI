@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { Radar, Mic, User, Settings, LogOut, Plus } from "lucide-react";
+import { Radar, Mic, Home, LogOut, Plus, HeartPulse, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";
 import AddPatientModal from "@/components/AddPatientModal";
-import { toast } from "sonner";
+import { motion } from "framer-motion";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -16,91 +16,134 @@ export default function Sidebar() {
   const logout = useAppStore(state => state.logout);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const navItems = currentUser === 'admin' ? [
-    { href: "/", icon: Radar, label: "Village Radar" },
-    { href: "/voice", icon: Mic, label: "Ambient Copilot" },
-  ] : [
-    { href: "/", icon: User, label: "Parent Home" }
-  ];
+  const navItems = currentUser === "admin"
+    ? [
+        { href: "/",      icon: Radar, label: "Village Radar",    desc: "Patient overview" },
+        { href: "/voice", icon: Mic,   label: "Ambient Copilot",  desc: "AI voice screening" },
+      ]
+    : [
+        { href: "/", icon: Home, label: "Health Dashboard", desc: "Your child's status" },
+      ];
+
+  const initials = currentUser === "admin" ? "AD" : (currentUser ?? "").toUpperCase();
+  const displayName = currentUser === "admin" ? "Anganwadi Admin" : "Parent Account";
+  const displaySub  = currentUser === "admin" ? "BioMed Bharat '26" : `ID: ${currentUser}`;
 
   return (
-    <div className="w-64 h-full bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col shadow-sm flex-shrink-0 z-50">
-      <div className="p-6 flex items-center gap-3 border-b border-slate-100 dark:border-slate-800">
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md" style={{ backgroundColor: "var(--color-bio-green)" }}>
-          NT
+    <>
+      <motion.aside
+        initial={{ x: -20, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="w-64 h-full flex flex-col flex-shrink-0 z-50 relative"
+        style={{ background: "linear-gradient(180deg, #1B5E20 0%, #2E7D32 60%, #33691E 100%)" }}
+      >
+        {/* Decorative orbs */}
+        <div className="absolute top-0 right-0 w-40 h-40 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%)" }} />
+        <div className="absolute bottom-20 left-0 w-32 h-32 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%)" }} />
+
+        {/* Logo */}
+        <div className="px-6 py-6 flex items-center gap-3 border-b border-white/10">
+          <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center border border-white/25 backdrop-blur-sm">
+            <HeartPulse size={20} className="text-white" />
+          </div>
+          <div>
+            <p className="text-white font-black text-base tracking-tight leading-none">NutriTrack AI</p>
+            <p className="text-green-300/70 text-[10px] font-medium tracking-widest uppercase mt-0.5">Health Platform</p>
+          </div>
         </div>
-        <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">NutriTrack AI</span>
-      </div>
 
-      <div className="flex-1 px-4 py-6 space-y-2 overflow-y-auto no-scrollbar">
-        <p className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Platform</p>
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          const Icon = item.icon;
+        {/* Nav */}
+        <div className="flex-1 px-3 py-5 space-y-1 overflow-y-auto no-scrollbar">
+          <p className="px-3 text-[10px] font-bold text-green-300/50 uppercase tracking-widest mb-3">Navigation</p>
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            const Icon = item.icon;
+            return (
+              <Link key={item.href} href={item.href}>
+                <motion.div
+                  whileHover={{ x: 3 }}
+                  transition={{ duration: 0.15 }}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-3 rounded-2xl transition-all duration-200 cursor-pointer group relative",
+                    isActive
+                      ? "bg-white/18 border border-white/20"
+                      : "hover:bg-white/10"
+                  )}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute inset-0 rounded-2xl"
+                      style={{ background: "rgba(255,255,255,0.14)" }}
+                    />
+                  )}
+                  <div className={cn(
+                    "w-9 h-9 rounded-xl flex items-center justify-center shrink-0 relative z-10",
+                    isActive ? "bg-white/25" : "bg-white/10 group-hover:bg-white/18"
+                  )}>
+                    <Icon size={18} className={isActive ? "text-white" : "text-green-200"} />
+                  </div>
+                  <div className="flex-1 relative z-10 min-w-0">
+                    <p className={cn("text-sm font-semibold leading-none", isActive ? "text-white" : "text-green-100")}>{item.label}</p>
+                    <p className="text-[11px] text-green-300/60 mt-0.5 truncate">{item.desc}</p>
+                  </div>
+                  {isActive && <ChevronRight size={14} className="text-white/60 relative z-10 shrink-0" />}
+                </motion.div>
+              </Link>
+            );
+          })}
 
-          return (
-            <Link 
-              key={item.href} 
-              href={item.href} 
-              className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group",
-                isActive 
-                  ? "dark:bg-slate-900 bg-slate-50" 
-                  : "text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900/50 hover:text-slate-900 dark:hover:text-slate-200"
-              )}
-              style={isActive ? { color: "var(--color-bio-green)", borderColor: "rgba(46,125,50,0.2)", borderWidth: "1px" } : {}}
-            >
-              <Icon size={20} style={isActive ? { color: "var(--color-bio-green)" } : {}} className={cn(!isActive && "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300")} />
-              <span className="font-medium text-sm">{item.label}</span>
-            </Link>
-          );
-        })}
-      </div>
-
-      <div className="p-4 border-t border-slate-100 dark:border-slate-800">
-        <div className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/50 cursor-pointer transition-colors mb-2">
-          <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 border-2 border-white dark:border-slate-700 flex items-center justify-center overflow-hidden">
-            <User size={20} className="text-slate-500" />
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <p className="text-sm font-semibold truncate">
-              {currentUser === 'admin' ? "Team Sapphire" : "Parent Account"}
-            </p>
-            <p className="text-[11px] text-slate-500 truncate">
-              {currentUser === 'admin' ? "BioMed Bharat '26" : `ID: ${currentUser}`}
-            </p>
-          </div>
-          
-          {/* Add Child Button */}
-          {currentUser === 'admin' && (
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center hover:bg-indigo-200 dark:hover:bg-indigo-500/40 transition-colors ml-2"
-            >
-              <Plus size={16} />
-            </button>
+          {/* Register child CTA — admin only */}
+          {currentUser === "admin" && (
+            <div className="pt-4 mt-2 border-t border-white/10">
+              <p className="px-3 text-[10px] font-bold text-green-300/50 uppercase tracking-widest mb-3">Actions</p>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => setIsModalOpen(true)}
+                className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl border border-white/20 bg-white/10 hover:bg-white/18 transition-all group"
+              >
+                <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                  <Plus size={18} className="text-white" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-white leading-none">Register Child</p>
+                  <p className="text-[11px] text-green-300/60 mt-0.5">Add to ICDS network</p>
+                </div>
+              </motion.button>
+            </div>
           )}
-
-          <button 
-            onClick={() => toast.info("Settings panel is locked for the BioMed Bharat demo.")}
-            className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors ml-1"
-          >
-            <Settings size={18} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" />
-          </button>
         </div>
-        <button 
-          onClick={() => {
-            logout();
-            router.push('/');
-          }}
-          className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 font-bold text-sm transition-all group mt-2"
-        >
-          <LogOut size={18} className="group-hover:-translate-x-1 transition-transform" />
-          Sign Out
-        </button>
-      </div>
+
+        {/* User + Sign Out */}
+        <div className="px-3 py-4 border-t border-white/10 space-y-2">
+          <div className="flex items-center gap-3 px-3 py-2.5 rounded-2xl bg-white/8">
+            <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center border border-white/20 shrink-0">
+              <span className="text-white font-black text-xs">{initials}</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-white truncate leading-none">{displayName}</p>
+              <p className="text-[11px] text-green-300/60 mt-0.5 truncate">{displaySub}</p>
+            </div>
+          </div>
+
+          <motion.button
+            whileHover={{ x: 3 }}
+            onClick={() => { logout(); router.push("/"); }}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-red-500/20 text-green-200 hover:text-red-300 transition-all group"
+          >
+            <div className="w-9 h-9 rounded-xl bg-white/10 group-hover:bg-red-500/20 flex items-center justify-center transition-all">
+              <LogOut size={16} />
+            </div>
+            <span className="text-sm font-semibold">Sign Out</span>
+          </motion.button>
+        </div>
+      </motion.aside>
 
       <AddPatientModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-    </div>
+    </>
   );
 }
