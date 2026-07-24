@@ -71,6 +71,16 @@ export default function Sidebar() {
             </p>
           </div>
           
+          {/* Add Child Button */}
+          {currentUser === 'admin' && (
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center hover:bg-indigo-200 dark:hover:bg-indigo-500/40 transition-colors ml-2"
+            >
+              <Plus size={16} />
+            </button>
+          )}
+
           <button 
             onClick={() => toast.info("Settings panel is locked for the BioMed Bharat demo.")}
             className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors ml-1"
@@ -78,23 +88,12 @@ export default function Sidebar() {
             <Settings size={18} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" />
           </button>
         </div>
-
-        {/* Register Child Button - Only for Admin */}
-        {currentUser === 'admin' && (
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="w-full flex items-center justify-center gap-2 px-3 py-3 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 font-bold text-sm transition-all border border-indigo-100 dark:border-indigo-500/20 mb-3"
-          >
-            <Plus size={18} /> Register Child
-          </button>
-        )}
-
         <button 
           onClick={() => {
             logout();
             router.push('/');
           }}
-          className="flex items-center justify-center gap-3 w-full px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 font-bold text-sm transition-all group mt-2"
+          className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 font-bold text-sm transition-all group mt-2"
         >
           <LogOut size={18} className="group-hover:-translate-x-1 transition-transform" />
           Sign Out

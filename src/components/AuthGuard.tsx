@@ -31,7 +31,6 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       login("admin");
       setIsRedirecting(true);
       toast.success("Authenticated as Anganwadi Admin");
-      // Redirect to admin dashboard
       setTimeout(() => router.push("/"), 100);
       return;
     }
@@ -41,7 +40,6 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       login(child.id);
       setIsRedirecting(true);
       toast.success(`Authenticated as Parent of ${child.name}`);
-      // Redirect to parent dashboard
       setTimeout(() => router.push("/"), 100);
       return;
     }
@@ -49,14 +47,14 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     toast.error("Invalid User ID or Password.");
   };
 
-  // If redirecting, show loading state
   if (isRedirecting) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center">
         <motion.div
           animate={{ scale: [1, 1.2, 1] }}
           transition={{ duration: 0.6, repeat: Infinity }}
-          className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center text-white shadow-xl"
+          className="w-16 h-16 rounded-lg flex items-center justify-center text-white shadow-xl"
+          style={{ backgroundColor: "var(--color-bio-green)" }}
         >
           <HeartPulse size={32} />
         </motion.div>
